@@ -45,7 +45,7 @@ const logout = () => {
     <Breadcrumb class="breadcrumb" />
     <div class="right-menu">
       <Screenfull v-if="showScreenfull" class="right-menu-item" />
-      <!-- <ThemeSwitch v-if="showThemeSwitch" class="right-menu-item" /> -->
+      <ThemeSwitch v-if="showThemeSwitch" class="right-menu-item" />
       <Notify v-if="showNotify" class="right-menu-item" />
       <el-dropdown class="right-menu-item">
         <div class="right-menu-avatar">

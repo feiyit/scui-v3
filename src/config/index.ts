@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
   SIGN_KEY: "ab517f95fab7d57",
 
   //接口地址
-  API_URL: import.meta.env.VITE_BASE_API + "/api",
+  API_URL: import.meta.env.VITE_BASE_API,
 
   //服务器地址
   SERVER_URL: import.meta.env.VITE_BASE_API,

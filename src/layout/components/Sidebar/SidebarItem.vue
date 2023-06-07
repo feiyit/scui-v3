@@ -167,4 +167,24 @@ const resolvePath = (routePath: string) => {
     color: #1b2559;
   }
 }
+.dark {
+  .app-wrapper {
+  .sidebar-container {
+    :deep(.el-sub-menu__title) {
+      color: #ffffff !important;
+    }
+  }
+}
+}
+.dark .app-wrapper .sidebar-container .el-menu .el-menu-item{
+  color: #ffffff;
+}
+
+</style>
+<style>
+  .dark .app-wrapper .sidebar-container .el-sub-menu__title
+  ,.dark .el-popper .el-menu .el-menu-item
+  ,.dark .el-popper .el-menu .el-sub-menu__title{
+    color: #fff !important;
+  }
 </style>

@@ -19,12 +19,8 @@ const themeList: ThemeList[] = [
     name: DEFAULT_THEME_NAME
   },
   {
-    title: "黑暗",
+    title: "暗黑",
     name: "dark"
-  },
-  {
-    title: "深蓝",
-    name: "dark-blue"
   }
 ]
 

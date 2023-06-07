@@ -282,4 +282,16 @@ onMounted(() => {
     }
   }
 }
+.dark{
+  .tags-view-container{
+    .tags-view-wrapper {
+    .tags-view-item {
+      &::before,
+        &::after {
+          background-image: url(@/assets/layout/tab-dark.png);
+        }
+    }
+  }
+  }
+}
 </style>

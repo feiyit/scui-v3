@@ -42,4 +42,7 @@ const toggleClick = () => {
 .icon {
   vertical-align: middle;
 }
+.dark .quan{
+  background: #404d6a;
+}
 </style>

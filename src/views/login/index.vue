@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue"
+import { reactive, ref,inject } from "vue"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
 import { User, Lock, Key, Picture, Loading } from "@element-plus/icons-vue"
@@ -7,7 +7,7 @@ import ThemeSwitch from "@/components/ThemeSwitch/index.vue"
 import { type FormInstance, FormRules } from "element-plus"
 import { getLoginCodeApi } from "@/api/login"
 import { type LoginRequestData } from "@/api/login/types/login"
-
+const globalApi = inject("API")
 const router = useRouter()
 const loginFormRef = ref<FormInstance | null>(null)
 
@@ -31,40 +31,32 @@ const loginFormRules: FormRules = {
   code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
 }
 /** 登录逻辑 */
-const handleLogin = () => {
-  loginFormRef.value?.validate((valid: boolean) => {
+const handleLogin =  () => {
+  loginFormRef.value?.validate(async (valid: boolean) =>  {
     if (valid) {
       loading.value = true
-      useUserStore()
-        .login({
-          username: loginForm.username,
-          password: loginForm.password,
-          code: loginForm.code
-        })
-        .then(() => {
-          router.push({ path: "/" })
-        })
-        .catch(() => {
-          createCode()
+      const res=await useUserStore().login({username: loginForm.username,
+        password: loginForm.password,
+        code: loginForm.code});
+        loading.value = false
+      if(res.code==200){
+        router.push({ path: "/" })
+      }else{
+        createCode()
           loginForm.password = ""
-        })
-        .finally(() => {
-          loading.value = false
-        })
+      }
     } else {
       return false
     }
   })
 }
 /** 创建验证码 */
-const createCode = () => {
+const createCode = async () => {
+  const res= await globalApi.login.code.get()
   // 先清空验证码的输入
   loginForm.code = ""
   // 获取验证码
-  codeUrl.value = ""
-  getLoginCodeApi().then((res) => {
-    codeUrl.value = res.data
-  })
+  codeUrl.value = res.data
 }
 
 /** 初始化验证码 */

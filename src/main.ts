@@ -3,7 +3,7 @@ import { createApp } from "vue"
 import App from "@/App.vue"
 import store from "@/store"
 import router from "@/router"
-import "@/router/permission"
+// import "@/router/permission"
 import global from "./global"
 // load
 import { loadSvg } from "@/icons"

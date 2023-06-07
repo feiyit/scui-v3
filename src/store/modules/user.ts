@@ -1,16 +1,17 @@
-import { ref } from "vue"
+import { ref, inject } from "vue"
 import store from "@/store"
 import { defineStore } from "pinia"
 import { usePermissionStore } from "./permission"
 import { useTagsViewStore } from "./tags-view"
 import { getToken, removeToken, setToken } from "@/utils/cache/cookies"
 import router, { resetRouter } from "@/router"
-import { loginApi, getUserInfoApi } from "@/api/login"
+import { getUserInfoApi } from "@/api/login"
 import { type LoginRequestData } from "@/api/login/types/login"
 import { type RouteRecordRaw } from "vue-router"
 import asyncRouteSettings from "@/config/async-route"
 
 export const useUserStore = defineStore("user", () => {
+  const globalApi = inject("API")
   const token = ref<string>(getToken() || "")
   const roles = ref<string[]>([])
   const username = ref<string>("")
@@ -23,22 +24,28 @@ export const useUserStore = defineStore("user", () => {
     roles.value = value
   }
   /** 登录 */
-  const login = (loginData: LoginRequestData) => {
-    return new Promise((resolve, reject) => {
-      loginApi({
-        username: loginData.username,
-        password: loginData.password,
-        code: loginData.code
+  const login = async (loginData: LoginRequestData) => {
+    const res = await globalApi.login.submit.post(loginData)
+    if (res.code === 200) {
+      setToken(res.data.accessToken)
+      token.value = res.data.accessToken
+      username.value = res.data.userInfo.username
+      roles.value = res.data.userInfo.roles
+      if (asyncRouteSettings.open) {
+        permissionStore.setRoutes(roles.value)
+      } else {
+        // 没有开启动态路由功能，则启用默认角色
+        setRoles(asyncRouteSettings.defaultRoles)
+        permissionStore.setRoutes(asyncRouteSettings.defaultRoles)
+      }
+      // 将'有访问权限的动态路由' 添加到 Router 中
+      permissionStore.dynamicRoutes.forEach((route) => {
+        router.addRoute(route)
       })
-        .then((res) => {
-          setToken(res.data.token)
-          token.value = res.data.token
-          resolve(true)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+    } else {
+      roles.value = asyncRouteSettings.defaultRoles
+    }
+    return res
   }
   /** 获取用户详情 */
   const getInfo = () => {
