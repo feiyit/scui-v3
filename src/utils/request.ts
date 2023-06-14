@@ -11,7 +11,7 @@ axios.defaults.timeout = sysConfig.TIMEOUT
 // HTTP request 拦截器
 axios.interceptors.request.use(
   (config) => {
-    let token = tool.data.get("TOKEN")
+    const token = tool.storage.get("TOKEN")
     if (token) {
       config.headers[sysConfig.TOKEN_NAME] = sysConfig.TOKEN_PREFIX + token
     }
@@ -27,7 +27,7 @@ axios.interceptors.request.use(
     if (config.method == "post" || config.method == "put" || config.method == "delete") {
       signStr = sysConfig.APP_KEY + sysConfig.SIGN_KEY + timestamp + JSON.stringify(config.data)
     }
-    config.headers["signature"] = tool.crypto.MD5(signStr)
+    config.headers["signature"] = tool.crypto.md5(signStr)
     Object.assign(config.headers, sysConfig.HEADERS)
     return config
   },
@@ -43,7 +43,7 @@ let MessageBox_401_show = false
 axios.interceptors.response.use(
   (response) => {
     if (response.headers["x-refresh-token"]) {
-      tool.data.set("TOKEN", response.headers["x-refresh-token"])
+      tool.storage.set("TOKEN", response.headers["x-refresh-token"])
     }
     return response
   },

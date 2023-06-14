@@ -1,302 +1,203 @@
-/*
- * @Descripttion: 工具集
- */
+import Cookies from "js-cookie"
+import * as CryptoJS from "crypto-js"
+import { format } from "date-fns"
 
-import CryptoJS from "crypto-js"
-
-const tool = {}
-
-/* localStorage */
-tool.data = {
-  set(table, settings) {
-    var _set = JSON.stringify(settings)
-    return localStorage.setItem(table, _set)
-  },
-  get(table) {
-    var data = localStorage.getItem(table)
-    try {
-      data = JSON.parse(data)
-    } catch (err) {
-      return null
-    }
-    return data
-  },
-  remove(table) {
-    return localStorage.removeItem(table)
-  },
-  clear() {
-    return localStorage.clear()
-  }
+type Storage = {
+  key: string
+  value: any
 }
-
-/*sessionStorage*/
-tool.session = {
-  set(table, settings) {
-    var _set = JSON.stringify(settings)
-    return sessionStorage.setItem(table, _set)
-  },
-  get(table) {
-    var data = sessionStorage.getItem(table)
-    try {
-      data = JSON.parse(data)
-    } catch (err) {
-      return null
-    }
-    return data
-  },
-  remove(table) {
-    return sessionStorage.removeItem(table)
-  },
-  clear() {
-    return sessionStorage.clear()
-  }
-}
-
-/*cookie*/
-tool.cookie = {
-  set(name, value, config = {}) {
-    var cfg = {
-      expires: null,
-      path: null,
-      domain: null,
-      secure: false,
-      httpOnly: false,
-      ...config
-    }
-    var cookieStr = `${name}=${escape(value)}`
-    if (cfg.expires) {
-      var exp = new Date()
-      exp.setTime(exp.getTime() + parseInt(cfg.expires) * 1000)
-      cookieStr += `;expires=${exp.toGMTString()}`
-    }
-    if (cfg.path) {
-      cookieStr += `;path=${cfg.path}`
-    }
-    if (cfg.domain) {
-      cookieStr += `;domain=${cfg.domain}`
-    }
-    document.cookie = cookieStr
-  },
-  get(name) {
-    var arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"))
-    if (arr != null) {
-      return unescape(arr[2])
-    } else {
-      return null
-    }
-  },
-  remove(name) {
-    var exp = new Date()
-    exp.setTime(exp.getTime() - 1)
-    document.cookie = `${name}=;expires=${exp.toGMTString()}`
-  }
-}
-
-/* Fullscreen */
-tool.screen = function (element) {
-  var isFull = !!(
-    document.webkitIsFullScreen ||
-    document.mozFullScreen ||
-    document.msFullscreenElement ||
-    document.fullscreenElement
-  )
-  if (isFull) {
-    if (document.exitFullscreen) {
-      document.exitFullscreen()
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen()
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen()
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen()
-    }
-  } else {
-    if (element.requestFullscreen) {
-      element.requestFullscreen()
-    } else if (element.msRequestFullscreen) {
-      element.msRequestFullscreen()
-    } else if (element.mozRequestFullScreen) {
-      element.mozRequestFullScreen()
-    } else if (element.webkitRequestFullscreen) {
-      element.webkitRequestFullscreen()
+export class util {
+  storage = {
+    set(item: Storage) {
+      localStorage.setItem(item.key, JSON.stringify(item.value))
+    },
+    get(key: string) {
+      let result = localStorage.getItem(key)
+      result = (result && JSON.parse(result)) || null
+      return result
+    },
+    remove(key: string) {
+      localStorage.removeItem(key)
+    },
+    clear() {
+      localStorage.clear()
     }
   }
-}
-
-/* 复制对象 */
-tool.objCopy = function (obj) {
-  return JSON.parse(JSON.stringify(obj))
-}
-
-/* 日期格式化 */
-tool.dateFormat = function (date, fmt = "yyyy-MM-dd hh:mm:ss") {
-  date = new Date(date)
-  var o = {
-    "M+": date.getMonth() + 1, //月份
-    "d+": date.getDate(), //日
-    "h+": date.getHours(), //小时
-    "m+": date.getMinutes(), //分
-    "s+": date.getSeconds(), //秒
-    "q+": Math.floor((date.getMonth() + 3) / 3), //季度
-    S: date.getMilliseconds() //毫秒
-  }
-  if (/(y+)/.test(fmt)) {
-    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length))
-  }
-  for (var k in o) {
-    if (new RegExp("(" + k + ")").test(fmt)) {
-      fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length))
-    }
-  }
-  return fmt
-}
-
-/* 千分符 */
-tool.groupSeparator = function (num) {
-  num = num + ""
-  if (!num.includes(".")) {
-    num += "."
-  }
-  return num
-    .replace(/(\d)(?=(\d{3})+\.)/g, function ($0, $1) {
-      return $1 + ","
-    })
-    .replace(/\.$/, "")
-}
-
-tool.changeTree = function (data) {
-  if (data.length > 0) {
-    data.forEach((item) => {
-      const parentId = item.parentId
-      if (parentId) {
-        data.forEach((ele) => {
-          if (ele.id === parentId) {
-            let childArray = ele.children
-            if (!childArray) {
-              childArray = []
-            }
-
-            childArray.push(item)
-            ele.children = childArray
-          }
-        })
+  cookie = {
+    set(item: Storage) {
+      Cookies.set(item.key, JSON.stringify(item.value))
+    },
+    get(key: string) {
+      return Cookies.get(key)
+    },
+    remove(key: string) {
+      Cookies.remove(key)
+    },
+    clear() {
+      const cookies = document.cookie.split(";")
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i]
+        const eqPos = cookie.indexOf("=")
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT"
       }
-    })
-  }
-  return data.filter((item) => item.parentId == "0")
-}
-
-tool.uuid = function (length = 32) {
-  const num = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-  let str = ""
-  for (let i = 0; i < length; i++) {
-    str += num.charAt(Math.floor(Math.random() * num.length))
-  }
-  return str
-}
-
-tool.objKeySort = function (arys) {
-  var newkey = Object.keys(arys).sort()
-  var newObj = {} //创建一个新的对象，用于存放排好序的键值对
-  for (var i = 0; i < newkey.length; i++) {
-    //遍历newkey数组
-    newObj[newkey[i]] = arys[newkey[i]]
-    //向新创建的对象中按照排好的顺序依次增加键值对
-  }
-  let resStr = ""
-  for (const key in newObj) {
-    if (newObj[key]) {
-      resStr += key + newObj[key]
     }
   }
-
-  return resStr
-}
-tool.stringToByte = function (str) {
-  var len, c
-  len = str.length
-  var bytes = []
-  for (var i = 0; i < len; i++) {
-    c = str.charCodeAt(i)
-    if (c >= 0x010000 && c <= 0x10ffff) {
-      bytes.push(((c >> 18) & 0x07) | 0xf0)
-      bytes.push(((c >> 12) & 0x3f) | 0x80)
-      bytes.push(((c >> 6) & 0x3f) | 0x80)
-      bytes.push((c & 0x3f) | 0x80)
-    } else if (c >= 0x000800 && c <= 0x00ffff) {
-      bytes.push(((c >> 12) & 0x0f) | 0xe0)
-      bytes.push(((c >> 6) & 0x3f) | 0x80)
-      bytes.push((c & 0x3f) | 0x80)
-    } else if (c >= 0x000080 && c <= 0x0007ff) {
-      bytes.push(((c >> 6) & 0x1f) | 0xc0)
-      bytes.push((c & 0x3f) | 0x80)
+  session = {
+    set(item: Storage) {
+      sessionStorage.setItem(item.key, JSON.stringify(item.value))
+    },
+    get(key: string) {
+      let result = sessionStorage.getItem(key)
+      result = (result && JSON.parse(result)) || null
+      return result
+    },
+    remove(key: string) {
+      sessionStorage.removeItem(key)
+    },
+    clear() {
+      sessionStorage.clear()
+    }
+  }
+  crypto = {
+    // md5加密
+    md5(value: string): string {
+      return CryptoJS.MD5(value).toString()
+    },
+    // aes加密
+    aesEncrypt(value: string, key: string): string {
+      const encrypted = CryptoJS.AES.encrypt(value, key)
+      return encrypted.toString()
+    },
+    // aes解密
+    aesDecrypt(value: string, key: string): string {
+      const decrypted = CryptoJS.AES.decrypt(value, key)
+      return decrypted.toString(CryptoJS.enc.Utf8)
+    },
+    // des加密
+    desEncrypt(value: string, key: string): string {
+      const encrypted = CryptoJS.DES.encrypt(value, key)
+      return encrypted.toString()
+    },
+    // des解密
+    desDecrypt(value: string, key: string): string {
+      const decrypted = CryptoJS.DES.decrypt(value, key)
+      return decrypted.toString(CryptoJS.enc.Utf8)
+    },
+    // base64编码
+    base64Encode(value: string): string {
+      return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(value))
+    },
+    // base64解码
+    base64Decode(value: string): string {
+      return CryptoJS.enc.Base64.parse(value).toString(CryptoJS.enc.Utf8)
+    }
+  }
+  objIsNull = (obj: object): boolean => {
+    let result: boolean
+    if (obj && Object.keys(obj).length > 0) {
+      result = true
     } else {
-      bytes.push(c & 0xff)
+      result = false
     }
+    return result
   }
-  return new Int8Array(bytes)
-}
-
-/* 计算文件大小 */
-tool.fileSize = function (limit) {
-  var size = ""
-  if (limit < 0.1 * 1024) {
-    //小于0.1KB，则转化成B
-    size = limit.toFixed(2) + "B"
-  } else if (limit < 0.1 * 1024 * 1024) {
-    //小于0.1MB，则转化成KB
-    size = (limit / 1024).toFixed(2) + "KB"
-  } else if (limit < 0.1 * 1024 * 1024 * 1024) {
-    //小于0.1GB，则转化成MB
-    size = (limit / (1024 * 1024)).toFixed(2) + "MB"
-  } else {
-    //其他转化成GB
-    size = (limit / (1024 * 1024 * 1024)).toFixed(2) + "GB"
-  }
-
-  var sizeStr = size + "" //转成字符串
-  var index = sizeStr.indexOf(".") //获取小数点处的索引
-  var dou = sizeStr.substr(index + 1, 2) //获取小数点后两位的值
-  if (dou == "00") {
-    //判断后两位是否为00，如果是则删除00
-    return sizeStr.substring(0, index) + sizeStr.substr(index + 3, 2)
-  }
-  return size
-}
-
-/* 常用加解密 */
-tool.crypto = {
-  //MD5加密
-  MD5(data) {
-    return CryptoJS.MD5(data).toString()
-  },
-  //BASE64加解密
-  BASE64: {
-    encrypt(data) {
-      return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(data))
-    },
-    decrypt(cipher) {
-      return CryptoJS.enc.Base64.parse(cipher).toString(CryptoJS.enc.Utf8)
+  arrIsNull = (arr: any[]): boolean => {
+    let result: boolean
+    if (arr && arr.length > 0) {
+      result = true
+    } else {
+      result = false
     }
-  },
-  AES_SECRETKEY: "dd0308a654ea42eab695bf060241b5aa",
-  //AES加解密
-  AES: {
-    encrypt(data, secretKey) {
-      const result = CryptoJS.AES.encrypt(data, CryptoJS.enc.Utf8.parse(secretKey), {
-        mode: CryptoJS.mode.ECB,
-        padding: CryptoJS.pad.Pkcs7
+    return result
+  }
+  objKeySort(obj: Record<string, any>): Record<string, any> {
+    const sortedObj = Object.keys(obj)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = obj[key]
+        return acc
+      }, {})
+    return sortedObj
+  }
+  /* 复制对象 */
+  objCopy = (obj: any) => {
+    return JSON.parse(JSON.stringify(obj))
+  }
+  /* 日期格式化 */
+  dateFormat = (date: string | number | Date, fmt = "yyyy-MM-dd hh:mm:ss") => {
+    date = new Date(date)
+    return format(date, fmt)
+  }
+  /* 千分符 */
+  groupSeparator = (num: number) => {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+  }
+  // 列表树结构数据转成树形结构数据
+  changeTree = (data: any[]) => {
+    if (data.length > 0) {
+      data.forEach((item) => {
+        const parentId = item.parentId
+        if (parentId) {
+          data.forEach((ele) => {
+            if (ele.id === parentId) {
+              let childArray = ele.children
+              if (!childArray) {
+                childArray = []
+              }
+
+              childArray.push(item)
+              ele.children = childArray
+            }
+          })
+        }
       })
-      return result.toString()
-    },
-    decrypt(cipher, secretKey) {
-      const result = CryptoJS.AES.decrypt(cipher, CryptoJS.enc.Utf8.parse(secretKey), {
-        mode: CryptoJS.mode.ECB,
-        padding: CryptoJS.pad.Pkcs7
-      })
-      return CryptoJS.enc.Utf8.stringify(result)
     }
+    return data.filter((item) => item.parentId == "0")
+  }
+  uuid = (length = 32) => {
+    const num = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+    let str = ""
+    for (let i = 0; i < length; i++) {
+      str += num.charAt(Math.floor(Math.random() * num.length))
+    }
+    return str
+  }
+  fileSize = (limit: number) => {
+    let size = ""
+    if (limit < 0.1 * 1024) {
+      //小于0.1KB，则转化成B
+      size = limit.toFixed(2) + "B"
+    } else if (limit < 0.1 * 1024 * 1024) {
+      //小于0.1MB，则转化成KB
+      size = (limit / 1024).toFixed(2) + "KB"
+    } else if (limit < 0.1 * 1024 * 1024 * 1024) {
+      //小于0.1GB，则转化成MB
+      size = (limit / (1024 * 1024)).toFixed(2) + "MB"
+    } else {
+      //其他转化成GB
+      size = (limit / (1024 * 1024 * 1024)).toFixed(2) + "GB"
+    }
+    const sizeStr = size + "" //转成字符串
+    const index = sizeStr.indexOf(".") //获取小数点处的索引
+    const dou = sizeStr.substr(index + 1, 2) //获取小数点后两位的值
+    if (dou == "00") {
+      //判断后两位是否为00，如果是则删除00
+      return sizeStr.substring(0, index) + sizeStr.substr(index + 3, 2)
+    }
+    return size
+  }
+  uriGetParam = (name: string): string => {
+    const reg = new RegExp("[?&]" + name + "=([^&#]*)", "i")
+    const res = window.location.href.match(reg)
+    if (res && res.length > 1) {
+      return decodeURIComponent(res[1])
+    }
+    return ""
   }
 }
 
-export default tool
+export default new util()
+function arrIsNull(keys: RegExpMatchArray) {
+  throw new Error("Function not implemented.")
+}

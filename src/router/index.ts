@@ -83,6 +83,15 @@ export const constantRoutes: RouteRecordRaw[] = [
     },
     children: [
       {
+        path: "sc-table",
+        component: () => import("@/views/table/sctable/index.vue"),
+        name: "sctables",
+        meta: {
+          title: "sc-tables",
+          keepAlive: true
+        }
+      },
+      {
         path: "element-plus",
         component: () => import("@/views/table/element-plus/index.vue"),
         name: "ElementPlus",

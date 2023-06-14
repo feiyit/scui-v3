@@ -7,6 +7,8 @@ import ThemeSwitch from "@/components/ThemeSwitch/index.vue"
 import { type FormInstance, FormRules } from "element-plus"
 import { getLoginCodeApi } from "@/api/login"
 import { type LoginRequestData } from "@/api/login/types/login"
+import tool from "@/utils/tool"
+tool.storage.clear();
 const globalApi = inject("API")
 const router = useRouter()
 const loginFormRef = ref<FormInstance | null>(null)

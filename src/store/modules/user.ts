@@ -3,7 +3,8 @@ import store from "@/store"
 import { defineStore } from "pinia"
 import { usePermissionStore } from "./permission"
 import { useTagsViewStore } from "./tags-view"
-import { getToken, removeToken, setToken } from "@/utils/cache/cookies"
+import config from "@/config"
+import tool from "@/utils/tool"
 import router, { resetRouter } from "@/router"
 import { getUserInfoApi } from "@/api/login"
 import { type LoginRequestData } from "@/api/login/types/login"
@@ -12,7 +13,7 @@ import asyncRouteSettings from "@/config/async-route"
 
 export const useUserStore = defineStore("user", () => {
   const globalApi = inject("API")
-  const token = ref<string>(getToken() || "")
+  const token = ref<string>(tool.storage.get(config.TOKEN_NAME) || "")
   const roles = ref<string[]>([])
   const username = ref<string>("")
 
@@ -27,10 +28,11 @@ export const useUserStore = defineStore("user", () => {
   const login = async (loginData: LoginRequestData) => {
     const res = await globalApi.login.submit.post(loginData)
     if (res.code === 200) {
-      setToken(res.data.accessToken)
       token.value = res.data.accessToken
       username.value = res.data.userInfo.username
       roles.value = res.data.userInfo.roles
+      tool.storage.set({ key: config.TOKEN_NAME, value: res.data.accessToken })
+      tool.storage.set({ key: config.USER_INFO, value: res.data.userInfo })
       if (asyncRouteSettings.open) {
         permissionStore.setRoutes(roles.value)
       } else {
@@ -39,6 +41,7 @@ export const useUserStore = defineStore("user", () => {
         permissionStore.setRoutes(asyncRouteSettings.defaultRoles)
       }
       // 将'有访问权限的动态路由' 添加到 Router 中
+      console.log("permissionStore.dynamicRoutes", permissionStore.dynamicRoutes)
       permissionStore.dynamicRoutes.forEach((route) => {
         router.addRoute(route)
       })
@@ -70,9 +73,10 @@ export const useUserStore = defineStore("user", () => {
   }
   /** 切换角色 */
   const changeRoles = async (role: string) => {
+    console.log("changeRoles", role)
     const newToken = "token-" + role
     token.value = newToken
-    setToken(newToken)
+    //setToken(newToken)
     await getInfo()
     permissionStore.setRoutes(roles.value)
     resetRouter()
@@ -83,7 +87,7 @@ export const useUserStore = defineStore("user", () => {
   }
   /** 登出 */
   const logout = () => {
-    removeToken()
+    tool.storage.clear()
     token.value = ""
     roles.value = []
     resetRouter()
@@ -91,7 +95,7 @@ export const useUserStore = defineStore("user", () => {
   }
   /** 重置 Token */
   const resetToken = () => {
-    removeToken()
+    tool.storage.clear()
     token.value = ""
     roles.value = []
   }

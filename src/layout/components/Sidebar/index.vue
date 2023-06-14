@@ -27,7 +27,6 @@ const activeMenu = computed(() => {
   }
   return path
 })
-
 const isCollapse = computed(() => {
   return !appStore.sidebar.opened
 })

@@ -1,4 +1,7 @@
 const DEFAULT_CONFIG = {
+  //标题
+  APP_NAME: import.meta.env.VITE_APP_TITLE,
+
   //版本号
   APP_VER: "1.0.0",
 
@@ -19,6 +22,9 @@ const DEFAULT_CONFIG = {
 
   //TokenName
   TOKEN_NAME: "accessToken",
+
+  //UserInfo
+  USER_INFO: "userInfo",
 
   //Token前缀，注意最后有个空格，如不需要需设置空字符串
   TOKEN_PREFIX: "",
