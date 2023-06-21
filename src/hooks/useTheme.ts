@@ -37,6 +37,11 @@ const setHtmlRootClassName = (value: ThemeName) => {
   document.documentElement.className = value
 }
 
+/** 设置布局 */
+const setLayoutClassName = (value: ThemeName) => {
+  document.body.setAttribute("data-layout", value)
+}
+
 /** 初始化 */
 const initTheme = () => {
   // watchEffect 来收集副作用
@@ -44,6 +49,7 @@ const initTheme = () => {
     const value = activeThemeName.value
     setHtmlRootClassName(value)
     setActiveThemeName(value)
+    setLayoutClassName(value)
   })
 }
 

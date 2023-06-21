@@ -4,7 +4,7 @@ import { RouterLink, useRoute } from "vue-router"
 import { ElScrollbar } from "element-plus"
 import { ArrowLeft, ArrowRight } from "@element-plus/icons-vue"
 import { useSettingsStore } from "@/store/modules/settings"
-import Screenfull from "@/components/Screenfull/index.vue"
+import Screenfull from "../Screenfull/index.vue"
 
 const props = defineProps({
   tagRefs: {

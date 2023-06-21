@@ -18,6 +18,7 @@ const filterAsyncRoutes = (routes: RouteRecordRaw[], roles: string[]) => {
       if (tempRoute.children) {
         tempRoute.children = filterAsyncRoutes(tempRoute.children, roles)
       }
+      console.log("tempRoute", tempRoute)
       res.push(tempRoute)
     }
   })

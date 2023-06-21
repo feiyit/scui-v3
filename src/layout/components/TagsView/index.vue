@@ -6,6 +6,8 @@ import { usePermissionStore } from "@/store/modules/permission"
 import ScrollPane from "./ScrollPane.vue"
 import path from "path-browserify"
 import { Close, CircleCloseFilled } from "@element-plus/icons-vue"
+import dynamicRouter from "@/router/dynamic"
+import config from "@/config"
 
 const instance = getCurrentInstance()
 const router = useRouter()
@@ -51,14 +53,27 @@ const filterAffixTags = (routes: RouteRecordRaw[], basePath = "/") => {
   return tags
 }
 
-const initTags = () => {
-  affixTags = filterAffixTags(permissionStore.routes)
-  for (const tag of affixTags) {
-    // 必须含有 name 属性
-    if (tag.name) {
-      tagsViewStore.addVisitedView(tag)
+const treeFind = (tree, func) => {
+  for (const data of tree) {
+    if (func(data)) return data
+    if (data.children) {
+      const res = treeFind(data.children, func)
+      if (res) return res
     }
   }
+  return null
+}
+
+const initTags = () => {
+  var dashboardRoute = treeFind(dynamicRouter, (node) => node.path == config.DASHBOARD_URL)
+  tagsViewStore.addVisitedView(dashboardRoute)
+  // affixTags = filterAffixTags(permissionStore.routes)
+  // for (const tag of affixTags) {
+  //   // 必须含有 name 属性
+  //   if (tag.name) {
+  //     tagsViewStore.addVisitedView(tag)
+  //   }
+  // }
 }
 
 const addTags = () => {
@@ -124,9 +139,9 @@ const openMenu = (tag: TagView, e: MouseEvent) => {
   // 15: margin right
   const left15 = e.clientX - offsetLeft + 15
   if (left15 > maxLeft) {
-    left.value = maxLeft
+    left.value = maxLeft+200
   } else {
-    left.value = left15
+    left.value = left15+200
   }
   top.value = e.clientY
   visible.value = true

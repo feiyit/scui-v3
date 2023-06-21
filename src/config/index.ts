@@ -5,6 +5,9 @@ const DEFAULT_CONFIG = {
   //版本号
   APP_VER: "1.0.0",
 
+  //首页地址
+  DASHBOARD_URL: "/dashboard",
+
   //应用ID
   APP_KEY: "870cb6cfa286ac4cac462bc8e33b1bb5",
 

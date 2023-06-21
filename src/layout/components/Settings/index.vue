@@ -40,6 +40,15 @@ const settingsStore = useSettingsStore()
         <span>显示色弱模式</span>
         <el-switch v-model="settingsStore.showColorWeakness" class="drawer-switch" />
       </div>
+      <div class="drawer-item">
+        <span>框架布局</span>
+        <el-select v-model="settingsStore.layout" placeholder="请选择">
+          <el-option label="默认" value="default"></el-option>
+          <el-option label="通栏" value="header"></el-option>
+          <!-- <el-option label="经典" value="menu"></el-option>
+          <el-option label="功能坞" value="dock"></el-option> -->
+        </el-select>
+      </div>
     </div>
   </div>
 </template>

@@ -33,18 +33,18 @@ export const useUserStore = defineStore("user", () => {
       roles.value = res.data.userInfo.roles
       tool.storage.set({ key: config.TOKEN_NAME, value: res.data.accessToken })
       tool.storage.set({ key: config.USER_INFO, value: res.data.userInfo })
-      if (asyncRouteSettings.open) {
-        permissionStore.setRoutes(roles.value)
-      } else {
-        // 没有开启动态路由功能，则启用默认角色
-        setRoles(asyncRouteSettings.defaultRoles)
-        permissionStore.setRoutes(asyncRouteSettings.defaultRoles)
-      }
-      // 将'有访问权限的动态路由' 添加到 Router 中
-      console.log("permissionStore.dynamicRoutes", permissionStore.dynamicRoutes)
-      permissionStore.dynamicRoutes.forEach((route) => {
-        router.addRoute(route)
-      })
+      // if (asyncRouteSettings.open) {
+      //   permissionStore.setRoutes(roles.value)
+      // } else {
+      //   // 没有开启动态路由功能，则启用默认角色
+      //   setRoles(asyncRouteSettings.defaultRoles)
+      //   permissionStore.setRoutes(asyncRouteSettings.defaultRoles)
+      // }
+      // // 将'有访问权限的动态路由' 添加到 Router 中
+      // console.log("permissionStore.dynamicRoutes", permissionStore.dynamicRoutes)
+      // permissionStore.dynamicRoutes.forEach((route) => {
+      //   router.addRoute(route)
+      // })
     } else {
       roles.value = asyncRouteSettings.defaultRoles
     }

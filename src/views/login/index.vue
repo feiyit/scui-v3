@@ -3,7 +3,6 @@ import { reactive, ref,inject } from "vue"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
 import { User, Lock, Key, Picture, Loading } from "@element-plus/icons-vue"
-import ThemeSwitch from "@/components/ThemeSwitch/index.vue"
 import { type FormInstance, FormRules } from "element-plus"
 import { getLoginCodeApi } from "@/api/login"
 import { type LoginRequestData } from "@/api/login/types/login"
@@ -67,7 +66,7 @@ createCode()
 
 <template>
   <div class="login-container">
-    <ThemeSwitch class="theme-switch" />
+    <!-- <ThemeSwitch class="theme-switch" /> -->
     <div class="login-card">
       <div class="title">
         <img src="@/assets/layout/logo.png" style="width: 80px; height: auto" />

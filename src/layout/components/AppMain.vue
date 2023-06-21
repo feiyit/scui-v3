@@ -12,20 +12,19 @@ const key = computed(() => {
 </script>
 
 <template>
-  <section class="app-main">
-    <router-view v-slot="{ Component }">
-      <transition name="el-fade-in" mode="out-in">
-        <keep-alive :include="tagsViewStore.cachedViews">
-          <component :is="Component" :key="key" />
-        </keep-alive>
-      </transition>
-    </router-view>
-  </section>
+    <section class="app-main">
+      <router-view v-slot="{ Component }">
+        <transition name="el-fade-in" mode="out-in">
+          <keep-alive :include="tagsViewStore.cachedViews">
+            <component :is="Component" :key="key" />
+          </keep-alive>
+        </transition>
+      </router-view>
+    </section>
 </template>
 
 <style lang="scss" scoped>
 .app-main {
-  min-height: calc(100vh - var(--v3-navigationbar-height));
   width: 100%;
   position: relative;
   overflow: hidden;

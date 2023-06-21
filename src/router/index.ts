@@ -288,4 +288,34 @@ export function resetRouter() {
   }
 }
 
+// const filterAsyncRouter = (routerMap) => {
+//   const accessedRouters = []
+//   routerMap.forEach((item) => {
+//     item.meta = item.meta ? item.meta : {}
+//     //处理外部链接特殊路由
+//     if (item.meta.type == "iframe") {
+//       item.meta.url = item.path
+//       item.path = `/i/${item.name}`
+//     }
+//     //MAP转路由对象
+//     const route = {
+//       path: item.path,
+//       name: item.name,
+//       meta: item.meta,
+//       redirect: item.redirect,
+//       children: item.children ? filterAsyncRouter(item.children) : null,
+//       component: loadComponent(item.component)
+//     }
+//     accessedRouters.push(route)
+//   })
+//   return accessedRouters
+// }
+
+// const loadComponent = (component: any) => {
+//   if (component) {
+//     return () => import(`@/views/${component}`)
+//   } else {
+//     return () => Layout
+//   }
+// }
 export default router
