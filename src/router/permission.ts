@@ -1,4 +1,4 @@
-import router from "@/router"
+import router from "@/router/index1"
 import { useUserStoreHook } from "@/store/modules/user"
 import { usePermissionStoreHook } from "@/store/modules/permission"
 import { ElMessage } from "element-plus"

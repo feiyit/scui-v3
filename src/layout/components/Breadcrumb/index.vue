@@ -5,7 +5,6 @@ import { compile } from "path-to-regexp"
 
 const route = useRoute()
 const router = useRouter()
-
 const breadcrumbs = ref<RouteLocationMatched[]>([])
 
 const getBreadcrumb = () => {

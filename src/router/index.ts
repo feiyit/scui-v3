@@ -1,276 +1,148 @@
 import { type RouteRecordRaw, createRouter, createWebHashHistory, createWebHistory } from "vue-router"
+import NProgress from "nprogress"
+import "nprogress/nprogress.css"
+import { ElMessage } from "element-plus"
+import config from "@/config"
+import tool from "@/utils/tool"
+import systemRouter from "./systemRouter"
+import dynamicRouter from "./dynamic"
 
-const Layout = () => import("@/layout/index.vue")
-
-/** 常驻路由 */
-export const constantRoutes: RouteRecordRaw[] = [
-  {
-    path: "/redirect",
-    component: Layout,
-    meta: {
-      hidden: true
-    },
-    children: [
-      {
-        path: "/redirect/:path(.*)",
-        component: () => import("@/views/redirect/index.vue")
-      }
-    ]
-  },
-  {
-    path: "/403",
-    component: () => import("@/views/error-page/403.vue"),
-    meta: {
-      hidden: true
-    }
-  },
-  {
-    path: "/404",
-    component: () => import("@/views/error-page/404.vue"),
-    meta: {
-      hidden: true
-    },
-    alias: "/:pathMatch(.*)*"
-  },
-  {
-    path: "/login",
-    component: () => import("@/views/login/index.vue"),
-    meta: {
-      hidden: true
-    }
-  },
-  {
-    path: "/",
-    component: Layout,
-    redirect: "/dashboard",
-    children: [
-      {
-        path: "dashboard",
-        component: () => import("@/views/dashboard/index.vue"),
-        name: "Dashboard",
-        meta: {
-          title: "首页",
-          svgIcon: "dashboard",
-          affix: true
-        }
-      }
-    ]
-  },
-  {
-    path: "/unocss",
-    component: Layout,
-    redirect: "/unocss/index",
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/unocss/index.vue"),
-        name: "UnoCSS",
-        meta: {
-          title: "unocss",
-          svgIcon: "dashboard"
-        }
-      }
-    ]
-  },
-  {
-    path: "/table",
-    component: Layout,
-    redirect: "/table/element-plus",
-    name: "Table",
-    meta: {
-      title: "表格",
-      elIcon: "Grid"
-    },
-    children: [
-      {
-        path: "sc-table",
-        component: () => import("@/views/table/sctable/index.vue"),
-        name: "sctables",
-        meta: {
-          title: "sc-tables",
-          keepAlive: true
-        }
-      },
-      {
-        path: "element-plus",
-        component: () => import("@/views/table/element-plus/index.vue"),
-        name: "ElementPlus",
-        meta: {
-          title: "Element Plus",
-          keepAlive: true
-        }
-      },
-      {
-        path: "vxe-table",
-        component: () => import("@/views/table/vxe-table/index.vue"),
-        name: "VxeTable",
-        meta: {
-          title: "Vxe Table",
-          svgIcon: "dashboard",
-          keepAlive: true
-        }
-      }
-    ]
-  },
-  {
-    path: "/menu",
-    component: Layout,
-    redirect: "/menu/menu1",
-    name: "Menu",
-    meta: {
-      title: "多级菜单",
-      svgIcon: "menu"
-    },
-    children: [
-      {
-        path: "menu1",
-        component: () => import("@/views/menu/menu1/index.vue"),
-        redirect: "/menu/menu1/menu1-1",
-        name: "Menu1",
-        meta: {
-          title: "menu1"
-        },
-        children: [
-          {
-            path: "menu1-1",
-            component: () => import("@/views/menu/menu1/menu1-1/index.vue"),
-            name: "Menu1-1",
-            meta: {
-              title: "menu1-1"
-            }
-          },
-          {
-            path: "menu1-2",
-            component: () => import("@/views/menu/menu1/menu1-2/index.vue"),
-            redirect: "/menu/menu1/menu1-2/menu1-2-1",
-            name: "Menu1-2",
-            meta: {
-              title: "menu1-2"
-            },
-            children: [
-              {
-                path: "menu1-2-1",
-                component: () => import("@/views/menu/menu1/menu1-2/menu1-2-1/index.vue"),
-                name: "Menu1-2-1",
-                meta: {
-                  title: "menu1-2-1"
-                }
-              },
-              {
-                path: "menu1-2-2",
-                component: () => import("@/views/menu/menu1/menu1-2/menu1-2-2/index.vue"),
-                name: "Menu1-2-2",
-                meta: {
-                  title: "menu1-2-2"
-                }
-              }
-            ]
-          },
-          {
-            path: "menu1-3",
-            component: () => import("@/views/menu/menu1/menu1-3/index.vue"),
-            name: "Menu1-3",
-            meta: {
-              title: "menu1-3"
-            }
-          }
-        ]
-      },
-      {
-        path: "menu2",
-        component: () => import("@/views/menu/menu2/index.vue"),
-        name: "Menu2",
-        meta: {
-          title: "menu2"
-        }
-      }
-    ]
-  },
-  {
-    path: "/hook-demo",
-    component: Layout,
-    redirect: "/hook-demo/use-fetch-select",
-    name: "HookDemo",
-    meta: {
-      title: "hook 示例",
-      elIcon: "Menu",
-      alwaysShow: true
-    },
-    children: [
-      {
-        path: "use-fetch-select",
-        component: () => import("@/views/hook-demo/use-fetch-select.vue"),
-        name: "UseFetchSelect",
-        meta: {
-          title: "useFetchSelect"
-        }
-      },
-      {
-        path: "use-fullscreen-loading",
-        component: () => import("@/views/hook-demo/use-fullscreen-loading.vue"),
-        name: "UseFullscreenLoading",
-        meta: {
-          title: "useFullscreenLoading"
-        }
-      }
-    ]
-  }
-]
-
-/**
- * 动态路由
- * 用来放置有权限 (Roles 属性) 的路由
- * 必须带有 Name 属性
- */
-export const asyncRoutes: RouteRecordRaw[] = [
-  {
-    path: "/permission",
-    component: Layout,
-    redirect: "/permission/page",
-    name: "Permission",
-    meta: {
-      title: "权限管理",
-      svgIcon: "lock",
-      roles: ["admin", "editor"], // 可以在根路由中设置角色
-      alwaysShow: true // 将始终显示根菜单
-    },
-    children: [
-      {
-        path: "page",
-        component: () => import("@/views/permission/page.vue"),
-        name: "PagePermission",
-        meta: {
-          title: "页面权限",
-          roles: ["admin"] // 或者在子导航中设置角色
-        }
-      },
-      {
-        path: "directive",
-        component: () => import("@/views/permission/directive.vue"),
-        name: "DirectivePermission",
-        meta: {
-          title: "指令权限" // 如果未设置角色，则表示：该页面不需要权限，但会继承根路由的角色
-        }
-      }
-    ]
-  },
-  {
-    path: "/:pathMatch(.*)*", // Must put the 'ErrorPage' route at the end, 必须将 'ErrorPage' 路由放在最后
-    redirect: "/404",
-    name: "ErrorPage",
-    meta: {
-      hidden: true
-    }
-  }
-]
+//系统路由
+const routes = systemRouter
+//系统特殊路由
+const routes_404 = {
+  path: "/:pathMatch(.*)*",
+  hidden: true,
+  component: () => import("@/views/error-page/404.vue")
+}
+let routes_404_r = () => {}
 
 const router = createRouter({
   history:
     import.meta.env.VITE_ROUTER_HISTORY === "hash"
       ? createWebHashHistory(import.meta.env.VITE_PUBLIC_PATH)
       : createWebHistory(import.meta.env.VITE_PUBLIC_PATH),
-  routes: constantRoutes
+  routes: systemRouter
 })
+
+//设置标题
+document.title = config.APP_NAME
+
+NProgress.configure({ showSpinner: false })
+
+//判断是否已加载过动态/静态路由
+let isGetRouter = false
+
+router.beforeEach(async (to, _from, next) => {
+  NProgress.start()
+  //动态标题
+  document.title = to.meta.title ? `${to.meta.title} - ${config.APP_NAME}` : `${config.APP_NAME}`
+  // debugger
+  if (to.path === "/login") {
+    //删除路由(替换当前layout路由)
+    router.addRoute(routes[0])
+    //删除路由(404)
+    routes_404_r()
+    isGetRouter = false
+    next()
+    return false
+  }
+
+  if (routes.findIndex((r) => r.path === to.path) >= 0) {
+    next()
+    return false
+  }
+
+  const token = tool.storage.get(config.TOKEN_NAME)
+
+  if (!token) {
+    next({
+      path: "/login"
+    })
+    return false
+  }
+
+  //整页路由处理
+  if (to.meta.fullpage) {
+    to.matched = [to.matched[to.matched.length - 1]]
+  }
+  if (!isGetRouter) {
+    let menuRouter = filterAsyncRouter(dynamicRouter)
+    menuRouter = flatAsyncRoutes(menuRouter)
+    menuRouter.forEach((item) => {
+      router.addRoute("layout", item)
+    })
+    routes_404_r = router.addRoute(routes_404)
+    if (to.matched.length == 0) {
+      router.push(to.fullPath)
+    }
+    isGetRouter = true
+    next({ ...to, replace: true })
+  } else {
+    next()
+  }
+})
+
+router.afterEach(() => {
+  NProgress.done()
+})
+
+router.onError((error) => {
+  NProgress.done()
+  ElMessage.error(error.message || "路由守卫过程发生错误")
+})
+
+//入侵追加自定义方法、对象
+export const getMenu = () => {
+  return dynamicRouter
+}
+
+const filterAsyncRouter = (routerMap: RouteRecordRaw[]) => {
+  const res: RouteRecordRaw[] = []
+  routerMap.forEach((item) => {
+    item.meta = item.meta ? item.meta : {}
+    //处理外部链接特殊路由
+    if (item.meta.type == "iframe") {
+      item.meta.url = item.path
+      item.path = `/i/${String(item.name)}`
+    }
+    //MAP转路由对象
+    const tempRoute = {
+      path: item.path,
+      name: item.name,
+      meta: item.meta,
+      redirect: item.redirect,
+      children: item.children ? filterAsyncRouter(item.children) : null,
+      component: resolveComponent(item.component)
+    }
+    res.push(tempRoute)
+  })
+  return res
+}
+// 加载动态路由
+const pages = import.meta.glob("../views/**/*.vue")
+
+const resolveComponent = (name: any) => {
+  if (!name) {
+    return import("@/layout/index.vue")
+  }
+  const importPage = pages[`../views/${name}.vue`]
+  if (!importPage) {
+    throw new Error(`Unknown page ${name}. Is it located under Pages with a .vue extension?`)
+  }
+  return importPage().then((module: any) => module.default)
+}
+//路由扁平化
+function flatAsyncRoutes(tree: RouteRecordRaw[]): RouteRecordRaw[] {
+  return tree.reduce<RouteRecordRaw[]>((acc, node) => {
+    const temp = node
+    acc.push(temp)
+    if (node.children) {
+      acc.push(...flatAsyncRoutes(node.children))
+    }
+    return acc
+  }, [])
+}
 
 /** 重置路由 */
 export function resetRouter() {
@@ -288,34 +160,4 @@ export function resetRouter() {
   }
 }
 
-// const filterAsyncRouter = (routerMap) => {
-//   const accessedRouters = []
-//   routerMap.forEach((item) => {
-//     item.meta = item.meta ? item.meta : {}
-//     //处理外部链接特殊路由
-//     if (item.meta.type == "iframe") {
-//       item.meta.url = item.path
-//       item.path = `/i/${item.name}`
-//     }
-//     //MAP转路由对象
-//     const route = {
-//       path: item.path,
-//       name: item.name,
-//       meta: item.meta,
-//       redirect: item.redirect,
-//       children: item.children ? filterAsyncRouter(item.children) : null,
-//       component: loadComponent(item.component)
-//     }
-//     accessedRouters.push(route)
-//   })
-//   return accessedRouters
-// }
-
-// const loadComponent = (component: any) => {
-//   if (component) {
-//     return () => import(`@/views/${component}`)
-//   } else {
-//     return () => Layout
-//   }
-// }
 export default router

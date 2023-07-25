@@ -32,7 +32,7 @@ const layoutSettings: LayoutSettings = {
   showScreenfull: true,
   showGreyMode: false,
   showColorWeakness: false,
-  layout: "default"
+  layout: "header"
 }
 
 export default layoutSettings

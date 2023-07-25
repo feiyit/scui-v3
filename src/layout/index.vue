@@ -67,12 +67,6 @@ const activeMenu = computed(() => {
   }
   return path
 })
-
-
-// console.log("permissionStore.routes", permissionStore.routes)
-// console.log("permissionStore", activeMenu)
-// console.log("dynamicRouter", dynamicRouter)
-// console.log("config", config)
 //根据导航获得
 pmenu.value = dynamicRouter[0]
 
@@ -98,30 +92,28 @@ const filterUrl = (map) => {
   return newMap
 }
 nextMenu.value = filterUrl(pmenu.value.children)
-// console.log("nextMenu.value ", nextMenu.value)
 const showMenu = (route) => {
+  console.log('param',route)
   pmenu.value = route
   nextMenu.value = filterUrl(route.children)
-  // if ((!route.children || route.children.length == 0) && route.component) {
-  //   this.$router.push({ path: route.path })
-  // }
+  console.log('nextMenu',nextMenu.value)
+  if ((!route.children || route.children.length == 0) && route.component) {
+    router.push({ path: route.path })
+  }
 }
 
 //路由监听高亮
 const showThis = () => {
   active.value = activeMenu.value
-  console.log("route.matched", route.meta)
-  // if (route.matched.length > 1) {
-  //   pmenu.value = route.matched[route.matched.length - 2]
-  //   console.log("pmenu.value", pmenu.value)
-  // }
+  if (route.matched.length > 1) {
+    pmenu.value = route.matched[route.matched.length - 2]
+    console.log("pmenu.value", pmenu.value)
+  }
 }
 const getBreadcrumb = () => {
   const temp = route.matched.filter((item) => {
     return item.meta && item.meta.title && item.meta.breadcrumb !== false
   })
-  console.log('temp',temp)
-  console.log('router',router)
 }
 
 watch(
@@ -210,7 +202,7 @@ showThis()
         </div>
       </div>
       <div class="aminui-body el-container">
-        <Breadcrumb class="breadcrumb" />
+        <!-- <Breadcrumb class="breadcrumb" /> -->
         <TagsView v-show="showTagsView" />
         <AppMain />
       </div>

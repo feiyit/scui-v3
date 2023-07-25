@@ -2,7 +2,7 @@ import axios from "axios"
 import { ElNotification, ElMessageBox } from "element-plus"
 import sysConfig from "@/config"
 import tool from "@/utils/tool"
-import router from "@/router"
+import router from "@/router/index1"
 
 axios.defaults.baseURL = ""
 

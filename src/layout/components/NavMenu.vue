@@ -10,9 +10,6 @@
         target="_blank"
         @click.stop="() => {}"
       ></a>
-      <!-- <el-icon v-if="navMenu.meta && navMenu.meta.icon"
-        ><component :is="navMenu.meta.icon || 'el-icon-menu'"
-      /></el-icon> -->
       <svg-icon name="lock" />
       <template #title>
         <span>{{ navMenu.meta.title }}</span>
